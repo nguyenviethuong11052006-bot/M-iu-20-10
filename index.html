@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chúc Mừng Sinh Nhật!</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        magic: {
+                            pink: '#ff758c',
+                            purple: '#ff7eb3',
+                            accent: '#ffd166',
+                            dark: '#0f172a'
+                        }
+                    },
+                    fontFamily: {
+                        handwriting: ['Dancing Script', 'cursive'],
+                        sans: ['Quicksand', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background:
+                linear-gradient(rgba(10, 15, 25, 0.48), rgba(10, 15, 25, 0.58)),
+                url('image.png') center center / cover fixed no-repeat;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Float elements (Balloons & Sparkles) */
+        .floating-element {
+            position: absolute;
+            pointer-events: none;
+            animation: floatUp linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(105vh) scale(0.8) rotate(0deg);
+                opacity: 0.8;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-20vh) scale(1.1) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Glow 3D Card Effect */
+        .glow-card {
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 
+                        0 0 20px rgba(255, 117, 140, 0.3);
+            transition: transform 0.25s ease, box-shadow 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .glow-card:hover {
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5), 
+                        0 0 35px rgba(255, 126, 179, 0.6);
+            transform: perspective(1000px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateY(-5px);
+        }
+
+        /* Thiệp nghiêng nhẹ theo vị trí chuột */
+        .glow-card {
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
+
+        .glow-card:hover {
+            transform: perspective(1000px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateY(-5px);
+        }
+
+        /* Con trỏ nhấp nháy khi lời chúc đang được gõ */
+        #typewriter-text.is-typing::after {
+            content: '|';
+            display: inline-block;
+            margin-left: 3px;
+            color: #f9a8d4;
+            animation: caretBlink 0.8s steps(1) infinite;
+        }
+
+        @keyframes caretBlink {
+            50% { opacity: 0; }
+        }
+
+        /* Trái tim và ánh sáng xuất hiện tại điểm chạm */
+        .click-magic {
+            position: fixed;
+            z-index: 100;
+            pointer-events: none;
+            animation: clickMagicRise 900ms ease-out forwards;
+            filter: drop-shadow(0 0 8px rgba(255, 117, 140, 0.8));
+        }
+
+        @keyframes clickMagicRise {
+            from { opacity: 1; transform: translate(-50%, 0) scale(0.6) rotate(-12deg); }
+            to { opacity: 0; transform: translate(-50%, -90px) scale(1.5) rotate(18deg); }
+        }
+
+        /* Candle Flashing Flame */
+        .flame {
+            background: radial-gradient(ellipse at bottom, #fef08a 0%, #f97316 60%, transparent 100%);
+            border-radius: 50% 50% 20% 20%;
+            animation: flicker 0.1s ease-in-out infinite alternate;
+            box-shadow: 0 0 20px #f97316, 0 0 40px #fef08a;
+            transform-origin: center bottom;
+        }
+
+        @keyframes flicker {
+            0% { transform: scale(1) rotate(-2deg); opacity: 0.9; }
+            100% { transform: scale(1.1) rotate(2deg); opacity: 1; }
+        }
+
+        /* Smoke animation for blown candle */
+        .smoke {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 20px;
+            background: rgba(200, 200, 200, 0.6);
+            border-radius: 50%;
+            animation: riseSmoke 1.5s forwards ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes riseSmoke {
+            0% { opacity: 0.8; transform: translate(-50%, 0) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -40px) scale(3); filter: blur(4px); }
+        }
+
+        /* Glowing text */
+        .glow-text {
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 
+                         0 0 20px rgba(255, 117, 140, 0.8), 
+                         0 0 30px rgba(255, 117, 140, 0.6);
+        }
+
+        /* Photo Frame Effects */
+        .photo-frame {
+            position: relative;
+            padding: 8px;
+            background: linear-gradient(135deg, #ffe3e3, #ffd166, #ff758c);
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .photo-surprise {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            display: none;
+            overflow-y: auto;
+            padding: 2rem 1rem;
+            background: rgba(8, 10, 25, 0.92);
+            backdrop-filter: blur(8px);
+        }
+
+        .photo-surprise.is-open {
+            display: block;
+            animation: revealPhotos 0.35s ease-out both;
+        }
+
+        @keyframes revealPhotos {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .surprise-photo {
+            animation: popPhoto 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+        }
+
+        @keyframes popPhoto {
+            from { opacity: 0; transform: scale(0.65) rotate(-8deg); }
+            to { opacity: 1; transform: scale(1) rotate(0); }
+        }
+
+        /* Cuộn trang: tiến độ, hiệu ứng xuất hiện và nút về đầu trang */
+        #scroll-progress {
+            position: fixed;
+            inset: 0 auto auto 0;
+            width: 0;
+            height: 4px;
+            z-index: 100;
+            background: linear-gradient(90deg, #ff758c, #ffd166, #c084fc);
+            box-shadow: 0 0 12px rgba(255, 117, 140, 0.8);
+        }
+
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .reveal-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #back-to-top {
+            position: fixed;
+            right: 1.25rem;
+            bottom: 1.25rem;
+            z-index: 40;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(12px);
+            transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+        }
+
+        #back-to-top.is-visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .photo-frame img, .surprise-photo {
+            cursor: zoom-in;
+        }
+
+        .photo-lightbox {
+            position: fixed;
+            inset: 0;
+            z-index: 80;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            background: rgba(3, 5, 18, 0.94);
+            backdrop-filter: blur(12px);
+        }
+
+        .photo-lightbox.is-open {
+            display: flex;
+            animation: revealPhotos 0.25s ease-out both;
+        }
+
+        .photo-lightbox img {
+            max-width: min(92vw, 1100px);
+            max-height: 82vh;
+            object-fit: contain;
+            border-radius: 1rem;
+            box-shadow: 0 0 45px rgba(255, 117, 140, 0.35);
+            animation: popPhoto 0.3s ease-out both;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                scroll-behavior: auto !important;
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ff758c;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="text-white min-h-screen relative flex flex-col justify-between items-center px-4 py-8">
+
+    <div id="scroll-progress" aria-hidden="true"></div>
+
+    <!-- Nhạc nền: đặt tệp music.mp3 cùng thư mục với index.html -->
+    <audio id="background-music" src="ji.mp3" autoplay loop preload="auto"></audio>
+
+    <!-- Container hiệu ứng bay background (bong bóng, hoa tuyết, ngôi sao) -->
+    <div id="floating-container" class="fixed inset-0 pointer-events-none z-0 overflow-hidden"></div>
+
+    <!-- HEADER / TIÊU ĐỀ TRANG WEB -->
+    <header class="text-center z-10 my-4 max-w-2xl">
+        <div class="inline-block px-4 py-1.5 rounded-full bg-pink-500/20 border border-pink-400/30 text-pink-300 text-sm font-semibold tracking-wide mb-3 animate-pulse">
+            ✨ Kỉ niệm 16 năm ngày Dương được đẻ ✨
+        </div>
+        <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight font-handwriting glow-text text-transparent bg-clip-text bg-gradient-to-r from-pink-300 via-rose-300 to-amber-200">
+            Happy Birthday!
+        </h1>
+        <p class="mt-2 text-gray-300 text-sm md:text-base font-light">
+            Chào mừng ngày tuyệt vời nhất trong năm của một người thật đặc biệt! ❤️
+        </p>
+    </header>
+
+    <!-- NOI DUNG CHINHS -->
+    <main class="w-full max-w-4xl z-10 my-6 flex flex-col gap-10 items-center">
+
+        <!-- KHI BÁO BÁO NẾN TƯƠNG TÁC & BAN PHÁO HOA MAU -->
+        <section class="w-full flex flex-col items-center justify-center">
+            <div class="glow-card rounded-2xl p-6 md:p-8 w-full text-center relative overflow-hidden">
+                <p class="text-xs uppercase tracking-widest text-pink-300 font-semibold mb-2">Thổi Nến & Bật Quà</p>
+                <h2 class="text-2xl font-bold text-white mb-6">Hãy ước một điều ước thật đẹp nhé! 🎂</h2>
+
+                <!-- BÁNH SINH NHẬT TƯƠNG TÁC -->
+                <div class="relative w-48 h-44 mx-auto my-4 flex flex-col items-center justify-end">
+                    
+                    <!-- Nến sinh nhật -->
+                    <div id="candle" onclick="blowCandle()" class="cursor-pointer relative z-20 flex flex-col items-center group">
+                        <!-- Ngọn lửa -->
+                        <div id="flame" class="flame w-5 h-8 mb-1 group-hover:scale-125 transition-transform"></div>
+                        <div id="smoke-container" class="relative w-full"></div>
+                        <!-- Thân nến -->
+                        <div class="w-3 h-12 bg-gradient-to-b from-yellow-200 to-amber-400 rounded-t-sm shadow-md border-b border-amber-500"></div>
+                        <span class="text-[10px] text-pink-200 mt-1 opacity-80 group-hover:opacity-100 transition">(Anh Hưng bắt Dương chạm vào nến để thổi)</span>
+                    </div>
+
+                    <!-- Bánh kem 2 tầng -->
+                    <div class="w-36 h-12 bg-gradient-to-r from-pink-300 via-pink-200 to-pink-300 rounded-t-2xl shadow-inner relative overflow-hidden flex justify-around items-center pt-2">
+                        <!-- Trang trí bánh -->
+                        <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                        <div class="w-3 h-3 rounded-full bg-amber-300"></div>
+                        <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                        <div class="w-3 h-3 rounded-full bg-amber-300"></div>
+                    </div>
+                    <div class="w-48 h-16 bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 rounded-t-xl shadow-lg relative flex justify-around items-center border-t-4 border-white/50">
+                        <div class="w-full h-2 bg-white/40 absolute top-2 left-0"></div>
+                        <div class="text-xl text-purple-900 font-bold font-handwriting whitespace-nowrap">Nguyễn Thùy Dương</div>
+                    </div>
+                    <!-- Đĩa bánh -->
+                    <div class="w-56 h-4 bg-gray-200 rounded-full shadow-2xl border-t border-gray-300"></div>
+                </div>
+
+                <!-- NÚT MỞ QUÀ & BẮN PHÁO HOA HOÀNH TRÁNG -->
+                <div class="mt-6 flex flex-wrap justify-center gap-4">
+                    <button onclick="triggerSurprise()" class="px-8 py-3.5 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold text-base shadow-lg shadow-pink-500/40 hover:shadow-pink-500/70 hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
+                        <i class="fas fa-gift text-amber-300 text-lg"></i>
+                        <span>Mở Quà Sinh Nhật & Bắn Pháo Hoa!</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- KHUNG ẢNH SINH NHẬT & TẢI ẢNH THẬT -->
+        <section class="w-full">
+            <div class="glow-card rounded-2xl p-6 md:p-8">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                    <div>
+                        <h3 class="text-2xl font-bold text-white flex items-center gap-2">
+                            <i class="fas fa-camera-retro text-pink-400"></i>
+                            Kỷ niệm của Dương
+                        </h3>
+                        <p class="text-sm text-gray-300">Lưu giữ những khoảnh khắc đẹp đẽ nhất</p>
+                    </div>
+
+                </div>
+
+                <!-- Lưới hiển thị ảnh (Photo Grid) -->
+                <div id="photoGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                    <!-- Ảnh Placeholder 1 -->
+                    <div class="photo-frame group overflow-hidden">
+                        <div class="relative h-64 rounded-lg overflow-hidden bg-slate-800">
+                            <img src="1793019992744_190281317332911909_4822333735824953197_95cc92204f393a0ae5204893150c9c96.jpg" alt="Kỷ niệm của Dương 1" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex items-end p-4">
+                                <p class="text-xs text-white">Nụ cười rạng rỡ ✨</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ảnh Placeholder 2 -->
+                    <div class="photo-frame group overflow-hidden">
+                        <div class="relative h-64 rounded-lg overflow-hidden bg-slate-800">
+                            <img src="1793019992775_190281317332911909_4822333735824953197_8a382303796720910eadd4af817611c7.jpg" alt="Kỷ niệm của Dương 2" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex items-end p-4">
+                                <p class="text-xs text-white">Tuổi mới thật rực rỡ 🎈</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ảnh Placeholder 3 -->
+                    <div class="photo-frame group overflow-hidden sm:col-span-2 md:col-span-1">
+                        <div class="relative h-64 rounded-lg overflow-hidden bg-slate-800">
+                            <img src="1793019992811_190281317332911909_4822333735824953197_74814f8f672884b037861db5ddf4f1b7.jpg" alt="Kỷ niệm của Dương 3" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex items-end p-4">
+                                <p class="text-xs text-white">Ngập tràn niềm vui 🎂</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Video kỷ niệm -->
+        <section class="w-full">
+            <div class="glow-card rounded-2xl p-6 md:p-8 text-center">
+                <h3 class="text-2xl font-bold text-white flex items-center justify-center gap-2 mb-2">
+                    <i class="fas fa-film text-pink-400"></i>
+                    Kỉ niệm
+                </h3>
+                <p class="text-sm text-gray-300 mb-5">Cùng xem lại những khoảnh khắc đáng nhớ nhé 🎞️💖</p>
+                <video controls preload="metadata" playsinline class="w-full max-h-[70vh] rounded-xl border border-white/20 shadow-lg shadow-pink-500/20 bg-black">
+                    <source src="dư.mp4" type="video/mp4">
+                    Trình duyệt của bạn không hỗ trợ phát video.
+                </video>
+            </div>
+        </section>
+
+        <!-- Phần trắc nghiệm đã được gỡ bỏ.
+        <section class="w-full">
+            <div class="glow-card rounded-2xl p-6 md:p-8">
+                <div class="text-center mb-6">
+                    <h3 class="text-2xl font-bold text-white">Câu hỏi trắc nghiệm dành cho Dương 💌</h3>
+                    <p class="text-sm text-gray-300 mt-2">Trả lời các câu hỏi nhé! Kết quả chỉ hiển thị trên trang này, không được gửi đi.</p>
+                </div>
+                <form onsubmit="submitBirthdayQuiz(event)" class="space-y-4">
+                    <fieldset class="rounded-xl border border-white/10 bg-black/20 p-4">
+                        <legend class="px-1 text-pink-100">1. Điều Dương mong nhất trong tuổi mới là gì?</legend>
+                        <div class="mt-2 grid gap-2 sm:grid-cols-2">
+                            <label class="flex items-center gap-2"><input type="radio" name="answer1" value="Sức khỏe" required> Sức khỏe</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="answer1" value="Học tập, công việc tốt hơn"> Học tập, công việc tốt hơn</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="answer1" value="Thật nhiều niềm vui"> Thật nhiều niềm vui</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="answer1" value="Có thêm nhiều kỷ niệm đẹp"> Có thêm nhiều kỷ niệm đẹp</label>
+                        </div>
+                    </fieldset>
+                    <fieldset class="rounded-xl border border-white/10 bg-black/20 p-4">
+                        <legend class="px-1 text-pink-100">2. Kỷ niệm nào với anh Hưng khiến Dương nhớ nhất?</legend>
+                        <div class="mt-2 grid gap-2 sm:grid-cols-2">
+                            <label class="flex items-center gap-2"><input type="radio" name="answer2" value="Những lần trò chuyện"> Những lần trò chuyện</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="answer2" value="Những lần cùng đi chơi"> Những lần cùng đi chơi</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="answer2" value="Những lần cùng cười đùa"> Những lần cùng cười đùa</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="answer2" value="Một kỷ niệm khác"> Một kỷ niệm khác</label>
+                        </div>
+                    </fieldset>
+                    <fieldset class="rounded-xl border border-white/10 bg-black/20 p-4">
+                        <legend class="px-1 text-pink-100">3. Dương thích vị bánh sinh nhật nào nhất?</legend>
+                        <div class="mt-2 grid gap-2 sm:grid-cols-2">
+                            <label class="flex items-center gap-2"><input type="radio" name="answer3" value="Socola"> Socola</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="answer3" value="Dâu"> Dâu</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="answer3" value="Matcha"> Matcha</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="answer3" value="Vị khác"> Vị khác</label>
+                        </div>
+                    </fieldset>
+                    <fieldset class="rounded-xl border border-white/10 bg-black/20 p-4">
+                        <legend class="px-1 text-pink-100">4. Một ngày sinh nhật lý tưởng của Dương sẽ như thế nào?</legend>
+                        <div class="mt-2 grid gap-2 sm:grid-cols-2">
+                            <label class="flex items-center gap-2"><input type="radio" name="answer4" value="Ở bên gia đình"> Ở bên gia đình</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="answer4" value="Đi chơi cùng bạn bè"> Đi chơi cùng bạn bè</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="answer4" value="Có một bữa tiệc bất ngờ"> Có một bữa tiệc bất ngờ</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="answer4" value="Thư giãn theo cách mình thích"> Thư giãn theo cách mình thích</label>
+                        </div>
+                    </fieldset>
+                    <fieldset class="rounded-xl border border-white/10 bg-black/20 p-4">
+                        <legend class="px-1 text-pink-100">5. Nếu được đi du lịch ngay bây giờ, Dương muốn đến đâu?</legend>
+                        <div class="mt-2 grid gap-2 sm:grid-cols-2">
+                            <label class="flex items-center gap-2"><input type="radio" name="answer5" value="Đà Lạt"> Đà Lạt</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="answer5" value="Biển"> Biển</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="answer5" value="Một thành phố lớn"> Một thành phố lớn</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="answer5" value="Một nơi thật yên bình"> Một nơi thật yên bình</label>
+                        </div>
+                    </fieldset>
+                    <fieldset class="rounded-xl border border-white/10 bg-black/20 p-4">
+                        <legend class="px-1 text-pink-100">6. Bài hát nào hợp với tâm trạng của Dương lúc này?</legend>
+                        <div class="mt-2 grid gap-2 sm:grid-cols-2">
+                            <label class="flex items-center gap-2"><input type="radio" name="answer6" value="Nhạc vui tươi"> Nhạc vui tươi</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="answer6" value="Nhạc nhẹ nhàng"> Nhạc nhẹ nhàng</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="answer6" value="Nhạc tình cảm"> Nhạc tình cảm</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="answer6" value="Bài hát yêu thích khác"> Bài hát yêu thích khác</label>
+                        </div>
+                    </fieldset>
+                    <fieldset class="rounded-xl border border-white/10 bg-black/20 p-4">
+                        <legend class="px-1 text-pink-100">7. Nếu có một siêu năng lực trong một ngày, Dương sẽ chọn gì?</legend>
+                        <div class="mt-2 grid gap-2 sm:grid-cols-2">
+                            <label class="flex items-center gap-2"><input type="radio" name="answer7" value="Dịch chuyển tức thời"> Dịch chuyển tức thời</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="answer7" value="Đọc được suy nghĩ"> Đọc được suy nghĩ</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="answer7" value="Bay lượn"> Bay lượn</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="answer7" value="Điều khiển thời gian"> Điều khiển thời gian</label>
+                        </div>
+                    </fieldset>
+                    <fieldset class="rounded-xl border border-white/10 bg-black/20 p-4">
+                        <legend class="px-1 text-pink-100">8. Món quà nào khiến Dương vui nhất?</legend>
+                        <div class="mt-2 grid gap-2 sm:grid-cols-2">
+                            <label class="flex items-center gap-2"><input type="radio" name="answer8" value="Một bất ngờ đáng yêu"> Một bất ngờ đáng yêu</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="answer8" value="Đồ ăn ngon"> Đồ ăn ngon</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="answer8" value="Một chuyến đi"> Một chuyến đi</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="answer8" value="Món quà tự tay làm"> Món quà tự tay làm</label>
+                        </div>
+                    </fieldset>
+                    <fieldset class="rounded-xl border border-white/10 bg-black/20 p-4">
+                        <legend class="px-1 text-pink-100">9. Việc đầu tiên Dương muốn làm sau khi xem trang web này là gì?</legend>
+                        <div class="mt-2 grid gap-2 sm:grid-cols-2">
+                            <label class="flex items-center gap-2"><input type="radio" name="answer9" value="Xem lại ảnh và video"> Xem lại ảnh và video</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="answer9" value="Đọc lại lời chúc"> Đọc lại lời chúc</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="answer9" value="Trả lời anh Hưng"> Trả lời anh Hưng</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="answer9" value="Đi ăn bánh sinh nhật"> Đi ăn bánh sinh nhật</label>
+                        </div>
+                    </fieldset>
+                    <fieldset class="rounded-xl border border-white/10 bg-black/20 p-4">
+                        <legend class="px-1 text-pink-100">10. Dương muốn nhắn điều gì đến anh Hưng?</legend>
+                        <div class="mt-2 grid gap-2 sm:grid-cols-2">
+                            <label class="flex items-center gap-2"><input type="radio" name="answer10" value="Cảm ơn anh nhé"> Cảm ơn anh nhé</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="answer10" value="Lời chúc lại thật vui"> Lời chúc lại thật vui</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="answer10" value="Hẹn cùng đi ăn"> Hẹn cùng đi ăn</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="answer10" value="Một điều dễ thương khác"> Một điều dễ thương khác</label>
+                        </div>
+                    </fieldset>
+                    <div class="text-center pt-2">
+                        <button type="submit" class="rounded-full bg-gradient-to-r from-pink-500 to-rose-500 px-7 py-3 font-bold text-white shadow-lg shadow-pink-500/30 hover:scale-105 transition">Gửi câu trả lời 💖</button>
+                        <p id="quiz-result" class="mt-4 text-pink-200" aria-live="polite"></p>
+                    </div>
+                </form>
+            </div>
+        </section>
+        -->
+
+        <!-- THIỆP CHÚC MỪNG VỚI HIỆU ỨNG GÕ CHỮ (TYPEWRITER) -->
+        <section class="w-full">
+            <div class="glow-card rounded-2xl p-6 md:p-10 relative">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-full bg-pink-500/30 flex items-center justify-center text-pink-300 text-lg">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-white">Anh Hưng đẳng cấp chúc Dương</h3>
+                        <p class="text-xs text-gray-400">Gửi trọn tình yêu thương</p>
+                    </div>
+                </div>
+
+                <!-- Lời chúc với hiệu ứng gõ chữ -->
+                <div class="bg-black/30 rounded-xl p-6 border border-white/10 min-h-[160px] flex items-center">
+                    <p id="typewriter-text" class="text-base md:text-lg text-pink-100 leading-relaxed font-normal italic">
+                        <!-- Nội dung được điền bởi JS -->
+                    </p>
+                </div>
+
+                <!-- Nút phát lại lời chúc -->
+                <div class="mt-4 flex justify-end">
+                    <button onclick="restartTypewriter()" class="text-xs text-pink-300 hover:text-white transition flex items-center gap-1.5">
+                        <i class="fas fa-redo"></i>
+                        <span>Đọc lại lời chúc</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Trình phát lời nhắn ghi âm -->
+        <section class="w-full">
+            <div class="glow-card rounded-2xl p-6 text-center">
+                <h3 class="text-xl font-bold text-white mb-2">Lời nhắn ghi âm của anh Hưng 🎙️</h3>
+                <p class="text-sm text-gray-300 mb-4">Một lời chúc bằng giọng nói dành riêng cho Dương</p>
+                <audio id="voice-recording" controls preload="metadata" class="w-full max-w-lg mx-auto">
+                    <source src="ghi-am.m4a" type="audio/mp4">
+                    Trình duyệt của bạn không hỗ trợ phát âm thanh.
+                </audio>
+                <p class="text-sm text-pink-200 mt-5">Ấn vào dòng chữ để xem có gì nhé 👇</p>
+                <a href="https://docs.google.com/forms/d/1NWNPwah58xEhc56ODNQLatGQ8ljd5ryR8dvf65h6rck/edit" target="_blank" rel="noopener noreferrer" class="inline-block mt-2 text-pink-200 underline underline-offset-4 hover:text-amber-200 transition font-semibold">
+                    Dương ơi anh có điều bất ngờ này 💖
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bộ ảnh bất ngờ hiện ra khi mở quà -->
+    <div id="photo-surprise" class="photo-surprise" role="dialog" aria-modal="true" aria-labelledby="surprise-title" onclick="closePhotoSurprise(event)">
+        <div class="max-w-5xl mx-auto">
+            <div class="flex justify-between items-center mb-6 gap-4">
+                <h2 id="surprise-title" class="text-2xl md:text-4xl font-bold font-handwriting glow-text">Bất ngờ dành cho Dương! 💖</h2>
+                <button type="button" onclick="closePhotoSurprise()" class="rounded-full bg-white/10 hover:bg-white/20 px-4 py-2 text-white" aria-label="Đóng bộ ảnh">Đóng ✕</button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                <img class="surprise-photo w-full h-72 object-cover rounded-2xl shadow-xl" style="animation-delay: 0.05s" src="1793027941334_190281317332911909_4822333735824953197_22ef93babb9065806cc321f5244b3069.jpg" alt="Kỷ niệm đáng yêu của Dương 1">
+                <img class="surprise-photo w-full h-72 object-cover rounded-2xl shadow-xl" style="animation-delay: 0.15s" src="1793027939078_190281317332911909_4822333735824953197_8747f87ec1f718f1c5b6204f0c7d9072.jpg" alt="Kỷ niệm đáng yêu của Dương 2">
+                <img class="surprise-photo w-full h-72 object-cover rounded-2xl shadow-xl" style="animation-delay: 0.25s" src="1793027940456_190281317332911909_4822333735824953197_8c8e9853ad7ea3a25c85b68dbec4736e.jpg" alt="Kỷ niệm đáng yêu của Dương 3">
+                <img class="surprise-photo w-full h-72 object-cover rounded-2xl shadow-xl" style="animation-delay: 0.35s" src="1793027940100_190281317332911909_4822333735824953197_f1506cf5c6904d3d44ad3340f1350c73.jpg" alt="Kỷ niệm đáng yêu của Dương 4">
+            </div>
+            <p class="text-center text-pink-200 mt-6">Chúc Dương tuổi mới luôn vui vẻ và hạnh phúc! 🎂✨</p>
+        </div>
+    </div>
+
+    <!-- Ảnh bất ngờ hiện ra sau khi chạm vào nến -->
+    <div id="candle-photo-surprise" class="photo-surprise z-[60]" role="dialog" aria-modal="true" aria-labelledby="candle-photo-title" onclick="closeCandlePhotoSurprise(event)">
+        <div class="min-h-full flex flex-col items-center justify-center max-w-5xl mx-auto text-center">
+            <h2 id="candle-photo-title" class="text-3xl md:text-4xl font-bold font-handwriting glow-text mb-6">Một bất ngờ dành cho Dương! 💖</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full">
+                <img class="surprise-photo w-full h-64 object-cover rounded-2xl shadow-xl" style="animation-delay: 0.05s" src="1793027939396_190281317332911909_4822333735824953197_c0907c159557d696365d302dedcc284d.jpg" alt="Kỷ niệm đáng yêu của Dương 1">
+                <img class="surprise-photo w-full h-64 object-cover rounded-2xl shadow-xl" style="animation-delay: 0.15s" src="1793027939773_190281317332911909_4822333735824953197_170183ec464e0d1a3e4f30e48bd937d5.jpg" alt="Kỷ niệm đáng yêu của Dương 2">
+                <img class="surprise-photo w-full h-64 object-cover rounded-2xl shadow-xl" style="animation-delay: 0.25s" src="image.png" alt="Kỷ niệm đáng yêu của Dương 3">
+            </div>
+            <button type="button" onclick="closeCandlePhotoSurprise()" class="mt-6 rounded-full bg-white/10 hover:bg-white/20 px-5 py-2 text-white">Đóng ✕</button>
+        </div>
+    </div>
+
+    <!-- Xem ảnh phóng to khi bấm vào ảnh -->
+    <div id="photo-lightbox" class="photo-lightbox" role="dialog" aria-modal="true" aria-label="Ảnh phóng to" onclick="closePhotoLightbox(event)">
+        <button type="button" onclick="closePhotoLightbox()" class="absolute top-5 right-5 rounded-full bg-white/10 hover:bg-white/20 px-4 py-2 text-white" aria-label="Đóng ảnh">Đóng ✕</button>
+        <figure class="text-center">
+            <img id="lightbox-image" src="" alt="">
+            <figcaption id="lightbox-caption" class="text-pink-200 mt-3"></figcaption>
+        </figure>
+    </div>
+
+    <button id="back-to-top" type="button" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })" class="rounded-full bg-pink-500/90 hover:bg-pink-400 p-3 shadow-lg shadow-pink-500/30" aria-label="Về đầu trang" title="Về đầu trang">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- FOOTER -->
+    <footer class="z-10 text-center py-6 text-gray-400 text-xs border-t border-white/10 w-full max-w-4xl mt-6">
+        <p>Created with ❤️ for your special day. May all your dreams come true!</p>
+    </footer>
+
+    <!-- JAVASCRIPT HÀNH VI CỦA TRANG WEB -->
+    <script>
+        // 1. DỮ LIỆU LỜI CHÚC VÀ HIỆU ỨNG TYPEWRITER
+        const birthdayWish = "🎂🎉 Chúc mừng sinh nhật NTD, người vợ qua cách joke của a hehe 🎈💗. Anh chúc em tuổi mới vẫn xinh đẹp 🌷, vẫn hồn nhiên ✨, ngây thơ như cái cách mà em vẫn thể hiện trước anh 🥰. Anh chả bao giờ quên được sinh nhật em đâu vì đó là em mà 🎉💝, bạn thân Ngọc Hà và chị gái ruột Min thư hihi 🤭🎀. 🎂🎁 Nói vậy thôi, chứ a tập tành code web với đang học mấy cái linh tinh nên a thấy mai là sinh nhật em nên a làm thử xem sao 💻💖. Tuy hơi đơn điệu về hình thức cũng như chưa xinh đẹp lắm 🥹🌸 nhưng a mong em vx vui nhé 🫶🏻💗. Sinh nhật năm nay chắc anh chưa thể tặng cho em một món quà ví có nhiều lí do lắm 🎁🥺, nhưng mà thôi để dịp khác, anh sẽ tặng em nhiều món quà đặc biệt 🎀🎊. Và anh muốn em ghi nhớ rằng: \" Anh biết mọi thứ về em nên sinh nhật em thì làm sao mà quên được.\" 💌❤️. Cảm ơn em đã vô tri cho a vui 🤣💞, biết ơn rất rất nhiều nhé 🧸🌷. 🎂💖✨";
+        
+        let typewriterIndex = 0;
+        let isTypewriting = false;
+        let typewriterTimeout;
+
+        function startTypewriter() {
+            const container = document.getElementById('typewriter-text');
+            container.innerHTML = "";
+            typewriterIndex = 0;
+            isTypewriting = true;
+
+            container.classList.add('is-typing');
+
+            function type() {
+                if (typewriterIndex < birthdayWish.length) {
+                    container.innerHTML += birthdayWish.charAt(typewriterIndex);
+                    typewriterIndex++;
+                    typewriterTimeout = setTimeout(type, 35);
+                } else {
+                    isTypewriting = false;
+                    container.classList.remove('is-typing');
+                }
+            }
+            type();
+        }
+
+        function restartTypewriter() {
+            clearTimeout(typewriterTimeout);
+            startTypewriter();
+        }
+
+        // 2. TẠO BONG BÓNG VÀ HOẠT ẢNH TRÔI BỒNG BỀNH (BACKGROUND FLOATING)
+        function createFloatingElements() {
+            const container = document.getElementById('floating-container');
+            const icons = ['🎈', '✨', '🌸', '💖', '🎂', '🎉', '⭐', '❄️'];
+            const count = 25; // Số lượng vật thể
+
+            for (let i = 0; i < count; i++) {
+                const el = document.createElement('div');
+                el.className = 'floating-element';
+                
+                // Chọn ngẫu nhiên biểu tượng
+                const randomIcon = icons[Math.floor(Math.random() * icons.length)];
+                el.innerText = randomIcon;
+
+                // Tùy chỉnh vị trí và thời gian rơi/bay
+                const size = Math.random() * 20 + 15; // 15px -> 35px
+                const left = Math.random() * 100; // 0% -> 100%
+                const duration = Math.random() * 10 + 8; // 8s -> 18s
+                const delay = Math.random() * 8; // 0s -> 8s
+
+                el.style.fontSize = `${size}px`;
+                el.style.left = `${left}%`;
+                el.style.animationDuration = `${duration}s`;
+                el.style.animationDelay = `${delay}s`;
+
+                container.appendChild(el);
+            }
+        }
+
+        // 4. THỔI NẾN TƯƠNG TÁC
+        let isCandleBlown = false;
+
+        function blowCandle() {
+            if (isCandleBlown) return;
+
+            const flame = document.getElementById('flame');
+            const smokeContainer = document.getElementById('smoke-container');
+
+            // Tắt lửa
+            flame.style.display = 'none';
+
+            // Tạo khói bay
+            const smoke = document.createElement('div');
+            smoke.className = 'smoke';
+            smokeContainer.appendChild(smoke);
+
+            isCandleBlown = true;
+
+            // Kích hoạt pháo hoa ăn mừng nhỏ
+            confetti({
+                particleCount: 50,
+                spread: 60,
+                origin: { y: 0.6 }
+            });
+
+            // Hiện ảnh bất ngờ sau khi chạm vào nến
+            document.getElementById('candle-photo-surprise').classList.add('is-open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeCandlePhotoSurprise(event) {
+            if (event && event.target.id !== 'candle-photo-surprise') return;
+            document.getElementById('candle-photo-surprise').classList.remove('is-open');
+            document.body.style.overflow = '';
+        }
+
+        // 5. HIỆU ỨNG BẮN PHÁO HOA VÀ HIỆN BỘ ẢNH BẤT NGỜ
+        function triggerSurprise() {
+            document.getElementById('photo-surprise').classList.add('is-open');
+            document.body.style.overflow = 'hidden';
+
+            // Bắn pháo hoa dày và kéo dài hơn
+            const duration = 6 * 1000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 35, spread: 360, ticks: 70, zIndex: 999 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                const particleCount = 80 * (timeLeft / duration);
+                
+                // Bắn từ 2 góc màn hình
+                confetti(Object.assign({}, defaults, { 
+                    particleCount, 
+                    origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } 
+                }));
+                confetti(Object.assign({}, defaults, { 
+                    particleCount, 
+                    origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } 
+                }));
+            }, 180);
+        }
+
+        function closePhotoSurprise(event) {
+            if (event && event.target.id !== 'photo-surprise') return;
+            document.getElementById('photo-surprise').classList.remove('is-open');
+            document.body.style.overflow = '';
+        }
+
+        // 6. XỬ LÝ THAY ĐỔI ẢNH CỦA NGUỜI DÙNG (IMAGE UPLOAD)
+        function handleImageUpload(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+
+            const photoGrid = document.getElementById('photoGrid');
+            photoGrid.innerHTML = ''; // Xóa các ảnh placeholder cũ
+
+            Array.from(files).forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const photoFrame = document.createElement('div');
+                    photoFrame.className = 'photo-frame group overflow-hidden';
+                    photoFrame.innerHTML = `
+                        <div class="relative h-64 rounded-lg overflow-hidden bg-slate-800">
+                            <img src="${e.target.result}" alt="Uploaded Birthday Photo ${index + 1}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex items-end p-4">
+                                <p class="text-xs text-white">Khoảnh khắc đáng nhớ 💖</p>
+                            </div>
+                        </div>
+                    `;
+                    photoGrid.appendChild(photoFrame);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Phát nhạc nền; nếu trình duyệt chặn autoplay, phát sau tương tác đầu tiên.
+        function startBackgroundMusic() {
+            const music = document.getElementById('background-music');
+            music.volume = 0.05;
+            document.getElementById('voice-recording').volume = 1;
+            music.play().catch(() => {
+                const resumeMusic = () => music.play().catch(() => {});
+                document.addEventListener('pointerdown', resumeMusic, { once: true });
+                document.addEventListener('keydown', resumeMusic, { once: true });
+            });
+        }
+
+        // Hiệu ứng nghiêng cho các tấm thiệp khi rê chuột
+        function enableCardTilt() {
+            document.querySelectorAll('.glow-card').forEach(card => {
+                card.addEventListener('pointermove', event => {
+                    if (event.pointerType !== 'mouse') return;
+                    const bounds = card.getBoundingClientRect();
+                    const x = (event.clientX - bounds.left) / bounds.width - 0.5;
+                    const y = (event.clientY - bounds.top) / bounds.height - 0.5;
+                    card.style.setProperty('--tilt-x', `${-y * 5}deg`);
+                    card.style.setProperty('--tilt-y', `${x * 5}deg`);
+                });
+                card.addEventListener('pointerleave', () => {
+                    card.style.removeProperty('--tilt-x');
+                    card.style.removeProperty('--tilt-y');
+                });
+            });
+        }
+
+        // Tạo một trái tim lấp lánh tại mỗi điểm chạm/click
+        function showClickMagic(event) {
+            if (event.target.closest('button, audio')) return;
+
+            const magic = document.createElement('span');
+            magic.className = 'click-magic';
+            magic.textContent = ['💖', '✨', '💕', '⭐'][Math.floor(Math.random() * 4)];
+            magic.style.left = `${event.clientX}px`;
+            magic.style.top = `${event.clientY}px`;
+            magic.style.fontSize = `${18 + Math.random() * 12}px`;
+            document.body.appendChild(magic);
+            magic.addEventListener('animationend', () => magic.remove(), { once: true });
+        }
+
+        // Hiện ảnh ở chế độ phóng to khi bấm vào ảnh trong các bộ sưu tập
+        let lightboxPreviousOverflow = '';
+
+        function openPhotoLightbox(image) {
+            const lightbox = document.getElementById('photo-lightbox');
+            const largeImage = document.getElementById('lightbox-image');
+            largeImage.src = image.src;
+            largeImage.alt = image.alt;
+            document.getElementById('lightbox-caption').textContent = image.alt;
+            lightboxPreviousOverflow = document.body.style.overflow;
+            lightbox.classList.add('is-open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePhotoLightbox(event) {
+            if (event && event.target.id !== 'photo-lightbox') return;
+            document.getElementById('photo-lightbox').classList.remove('is-open');
+            document.body.style.overflow = lightboxPreviousOverflow;
+        }
+
+        // Tự thêm câu hỏi tại đây: question = nội dung, options = các lựa chọn,
+        // correct = vị trí đáp án đúng (đếm từ 0: lựa chọn đầu tiên là 0).
+        const birthdayQuizQuestions = [
+            {
+                question: 'Trang web này chúc mừng sinh nhật ai?',
+                options: ['Ngọc Hà', 'Nguyễn Thùy Dương', 'Min', 'Anh Hưng'],
+                correct: 1
+            },
+            {
+                question: 'Trang ghi kỷ niệm bao nhiêu năm ngày Dương được sinh ra?',
+                options: ['14 năm', '15 năm', '16 năm', '17 năm'],
+                correct: 2
+            },
+            {
+                question: 'Trên chiếc bánh sinh nhật có ghi tên nào?',
+                options: ['Nguyễn Thùy Dương', 'Ngọc Hà', 'Min', 'Anh Hưng'],
+                correct: 0
+            }
+        ];
+
+        function renderBirthdayQuiz() {
+            const form = document.querySelector('form[onsubmit="submitBirthdayQuiz(event)"]');
+            form.innerHTML = birthdayQuizQuestions.map((item, questionIndex) => `
+                <fieldset class="rounded-xl border border-white/10 bg-black/20 p-4">
+                    <legend class="px-1 text-pink-100">${questionIndex + 1}. ${item.question}</legend>
+                    <div class="mt-2 grid gap-2 sm:grid-cols-2">
+                        ${item.options.map((option, optionIndex) => `
+                            <label class="flex items-center gap-2">
+                                <input type="radio" name="answer${questionIndex}" value="${optionIndex}" required>
+                                ${option}
+                            </label>
+                        `).join('')}
+                    </div>
+                </fieldset>
+            `).join('') + `
+                <div class="text-center pt-2">
+                    <button type="submit" class="rounded-full bg-gradient-to-r from-pink-500 to-rose-500 px-7 py-3 font-bold text-white shadow-lg shadow-pink-500/30 hover:scale-105 transition">Gửi câu trả lời 💖</button>
+                    <p id="quiz-result" class="mt-4 text-pink-200" aria-live="polite"></p>
+                </div>
+            `;
+        }
+
+        function submitBirthdayQuiz(event) {
+            event.preventDefault();
+            const form = event.currentTarget;
+            let score = 0;
+            const feedback = birthdayQuizQuestions.map((item, index) => {
+                const selected = form.elements[`answer${index}`].value;
+                const isCorrect = Number(selected) === item.correct;
+                if (isCorrect) score++;
+                return `${index + 1}. ${isCorrect ? 'Đúng ✅' : `Sai ❌ — Đáp án đúng: ${item.options[item.correct]}`}`;
+            });
+
+            const result = document.getElementById('quiz-result');
+            result.style.whiteSpace = 'pre-line';
+            result.textContent = `Dương đạt ${score}/${birthdayQuizQuestions.length} câu!\n${feedback.join('\n')}\nCảm ơn Dương đã tham gia 💖🎂`;
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 90, spread: 70, origin: { y: 0.7 } });
+            }
+        }
+
+        function enableExtraEffects() {
+            // Tiết lộ từng khu vực khi cuộn đến
+            const sections = document.querySelectorAll('main > section, footer');
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver(entries => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.12 });
+                sections.forEach(section => {
+                    section.classList.add('reveal-on-scroll');
+                    observer.observe(section);
+                });
+            }
+
+            // Thanh tiến độ cuộn trang và nút quay về đầu trang
+            const updateScrollEffects = () => {
+                const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
+                const progress = scrollableHeight > 0 ? window.scrollY / scrollableHeight * 100 : 0;
+                document.getElementById('scroll-progress').style.width = `${progress}%`;
+                document.getElementById('back-to-top').classList.toggle('is-visible', window.scrollY > 400);
+            };
+            window.addEventListener('scroll', updateScrollEffects, { passive: true });
+            updateScrollEffects();
+
+            // Bấm ảnh để xem phóng to; Escape để đóng
+            document.addEventListener('click', event => {
+                const image = event.target.closest('#photoGrid img, .surprise-photo');
+                if (image) openPhotoLightbox(image);
+            });
+            document.addEventListener('keydown', event => {
+                if (event.key === 'Escape') closePhotoLightbox();
+            });
+        }
+
+        // KHỞI TẠO TRANG WEB KHI TẢI XONG
+        window.onload = function() {
+            createFloatingElements();
+            enableCardTilt();
+            enableExtraEffects();
+            document.addEventListener('pointerdown', showClickMagic);
+            startTypewriter();
+            startBackgroundMusic();
+        };
+    </script>
+</body>
+</html>
